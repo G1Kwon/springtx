@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/itemservice
+    username: sa
+    password:
+    driver-class-name: org.postgresql.Driver
+#Sql log
+logging:
+  level:
+    org:
+      springframework:
+        jdbc: debug
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
