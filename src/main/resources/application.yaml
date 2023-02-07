@@ -1,18 +1,18 @@
-spring:
-  config:
-    activate:
-      on-profile: local
-  datasource:
-    url: jdbc:postgresql://localhost:5432/itemservice
-    username: sa
-    password:
-    driver-class-name: org.postgresql.Driver
+#spring:
+#  config:
+#    activate:
+#      on-profile: local
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/itemservice
+#    username: sa
+#    password:
+#    driver-class-name: org.postgresql.Driver
 #Sql log
 logging:
   level:
     org:
       springframework:
-        jdbc: debug
+        transaction.interceptor: TRACE
       hibernate:
         SQL: debug
         type:
