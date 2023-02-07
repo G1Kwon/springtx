@@ -7,14 +7,18 @@
 #    username: sa
 #    password:
 #    driver-class-name: org.postgresql.Driver
-#Sql log
 logging:
   level:
     org:
       springframework:
         transaction.interceptor: TRACE
+        jdbc.datasource.DataSourceTransactionManager: DEBUG
+        #JPA log
+        orm.jpa.JpaTransactionManager: DEBUG
+      #Sql log
       hibernate:
-        SQL: debug
+        resource.transaction: DEBUG
+        SQL: DEBUG
         type:
           descriptor:
             sql:

@@ -35,6 +35,7 @@ public class InitTxTest {
     @Slf4j
     static class Hello {
 
+        //초기화 코드가 먼저 호출되고, 그 다음에 트랜잭션 AOP가 적용되기 때문에 초기화 시점에는 해당 메서드에서 트랜잭션을 획득할 수 없다.
         @PostConstruct
         @Transactional
         public void initV1() {
@@ -44,7 +45,8 @@ public class InitTxTest {
 
         @EventListener(ApplicationReadyEvent.class)
         @Transactional
-        public void initV2() {            boolean isActive = TransactionSynchronizationManager.isActualTransactionActive();
+        public void initV2() {
+            boolean isActive = TransactionSynchronizationManager.isActualTransactionActive();
             log.info("Hello init ApplicationReadyEvent tx active={}", isActive);
         }
     }
