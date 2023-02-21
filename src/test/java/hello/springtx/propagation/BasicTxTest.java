@@ -78,4 +78,29 @@ public class BasicTxTest {
 
         log.info("Transaction Commit Complete");
     }
+
+    @Test
+    void inner_commit() {
+        log.info("외부 트랜잭션 시작");
+        //외부 트랜잭션만 물리 트랜잭션을 시작한다.
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());
+
+        inner();
+
+        log.info("외부 트랜잭션 커밋");
+        //외부 트랜잭션만 물리 트랜잭션을 커밋한다.
+        txManager.commit(outer);
+    }
+
+    private void inner() {
+        log.info("내부 트랜잭션 시작");
+        //내부 트랜잭션은 외부 트랜잭션에 참여만 하지 시작을 하지 않는다. (로그 참고)
+        TransactionStatus inner = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());
+
+        log.info("내부 트랜잭션 커밋");
+        //내부 트랜잭션에서는 물리 트랜잭션 커밋이 일어나지 않는다.
+        txManager.commit(inner);
+    }
 }
