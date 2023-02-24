@@ -10,12 +10,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 import javax.sql.DataSource;
-import java.rmi.UnexpectedException;
 
 @Slf4j
 @SpringBootTest
@@ -134,9 +134,30 @@ public class BasicTxTest {
         //Participating transaction failed - marking existing transaction as rollback-only 마킹
         txManager.rollback(inner);
 
-        //Global transaction is marked as rollback-only but transactional code requested commit
+        //Global transaction is marked as rollback-only but  transactional code requested commit
         log.info("외부 트랜잭션 커밋");
         Assertions.assertThatThrownBy(() -> txManager.commit(outer))
                 .isInstanceOf(UnexpectedRollbackException.class);
+    }
+
+    @Test
+    void inner_rollback_requires_new() {
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction()); // True
+
+        log.info("내부 트랜잭션 시작");
+        DefaultTransactionAttribute definition = new DefaultTransactionAttribute();
+        definition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        //Suspending current transaction, creating new transaction with name [null]
+        //새로운 물리 트랜잭션 시작
+        TransactionStatus inner = txManager.getTransaction(definition);
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction()); // True
+
+        log.info("내부 트랜잭션 롤백");
+        txManager.rollback(inner);
+
+        log.info("외부 트랜잭션 커밋");
+        txManager.rollback(outer);
     }
 }
